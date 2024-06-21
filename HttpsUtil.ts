@@ -1,8 +1,8 @@
 class HttpsUtil {
     /**
-     * 发送GET请求
-     * @param url 请求的URL
-     * @param params 请求参数对象
+     * send GET request
+     * @param url request URL
+     * @param params request object params
      */
     static async get(url: string, params: Record<string, any> = {}): Promise<any> {
         try {
@@ -11,19 +11,22 @@ class HttpsUtil {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
             });
+            // pass to response handle function to deal with response
             const responseData = await HttpsUtil.handleResponse(response);
+            // update state
             return { success: true, data: responseData };
         } catch (error) {
+            // pass to error handle function to deal with error
             return HttpsUtil.handleError(error);
         }
     }
 
     /**
-     * 发送POST请求
-     * @param url 请求的URL
-     * @param data 请求体数据对象
+     * send POST request
+     * @param url request URL
+     * @param data request object params
      */
     static async post(url: string, bodyData: Record<string, any>): Promise<any> {
         try {
@@ -32,7 +35,8 @@ class HttpsUtil {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(bodyData)
+                // convert into JSON if not
+                body: JSON.stringify(bodyData),
             });
             const responseData = await HttpsUtil.handleResponse(response);
             return { success: true, data: responseData };
@@ -42,24 +46,25 @@ class HttpsUtil {
     }
 
     /**
-     * 处理响应
-     * @param response fetch API的响应对象
+     * manage response
+     * @param response fetch API's object
      */
     private static async handleResponse(response: Response): Promise<any> {
+        // ok is a Response status, returned value from server
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({message: 'unknow error'}));
-            throw new Error(errorData.message || '请求失败');
+            throw new Error(errorData.message || 'request fail');
         }
         return await response.json();
     }
 
     /**
-     * 处理错误
-     * @param error 错误对象
+     * manage error
+     * @param error error object
      */
     private static handleError(error: any): any {
-        console.error('网络请求发生错误:', error);
-        return { success: false, message: error.message || '网络请求失败' };
+        console.error('internet request error: ', error);
+        return { success: false, message: error.message || 'server request fail' };
     }
 }
 
